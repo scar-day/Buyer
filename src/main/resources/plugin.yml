@@ -1,0 +1,7 @@
+name: Buyer
+version: '${project.version}'
+main: me.scarday.buyer.Main
+author: "ScarDay"
+api-version: '1.16'
+commands:
+  buyer: {}
