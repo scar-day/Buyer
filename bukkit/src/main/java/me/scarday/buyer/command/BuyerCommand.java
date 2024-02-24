@@ -82,7 +82,7 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
                         b.playSound(b.getLocation(), sound, SoundCategory.AMBIENT, 1.0F, 1.0F);
                     }
 
-                    commandSender.sendMessage(joinToString(getDonate.getStringList("broadcast")).replace("%player%", player.getName()));
+                    b.sendMessage(joinToString(getDonate.getStringList("broadcast")).replace("%player%", player.getName()));
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), joinToString(getDonate.getStringList("give")).replace("%player%", player.getName()).replace("%group%", strings[2].toLowerCase()));
                 }
 

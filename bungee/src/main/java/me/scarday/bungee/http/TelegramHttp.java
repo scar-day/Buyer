@@ -1,11 +1,12 @@
-package me.scarday.buyer.http;
+package me.scarday.bungee.http;
 
-import lombok.experimental.UtilityClass;
-import me.scarday.buyer.Main;
-import org.bukkit.Bukkit;
+import me.scarday.bungee.Main;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -14,13 +15,14 @@ import java.util.concurrent.CompletableFuture;
 
 public class TelegramHttp {
 
-    private Main instance;
+    private final Main instance;
 
     private final List<String> ids;
 
     private final String token;
 
-    public TelegramHttp(@NotNull List<String> ids, String token) {
+    public TelegramHttp(List<String> ids, String token, Main instance) {
+        this.instance = instance;
         this.ids = ids;
         this.token = token;
     }
@@ -45,15 +47,14 @@ public class TelegramHttp {
                         }
                         in.close();
 
-                        Bukkit.getLogger().info("Произошла ошибка при отправке сообщения: " + jsonResponse);
+                        instance.getLogger().info("Произошла ошибка при отправке сообщения: " + jsonResponse);
                     }
                     connection.disconnect();
                 } catch (IOException e) {
-                    Bukkit.getLogger().info("Произошла ошибка при отправке сообщения: " + e);
+                    instance.getLogger().info("Произошла ошибка при отправке сообщения: " + e);
                 }
             }
         });
     }
-
 
 }
