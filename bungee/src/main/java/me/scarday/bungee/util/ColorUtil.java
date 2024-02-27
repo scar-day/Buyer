@@ -13,10 +13,6 @@ public class ColorUtil {
 
     public String colorize(String message) {
 
-        if (message == null) {
-            return message;
-        }
-
         Pattern HEX_PATTERN = Pattern.compile("&#([a-fA-F\\d]{6})");
         Matcher matcher = HEX_PATTERN.matcher(message);
         StringBuilder buffer = new StringBuilder(message.length() + 4*8);

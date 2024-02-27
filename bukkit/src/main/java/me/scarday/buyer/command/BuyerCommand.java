@@ -5,7 +5,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.scarday.buyer.Main;
 import me.scarday.buyer.util.ColorUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.command.Command;
@@ -17,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,10 +32,6 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings)  {
-        if (!(commandSender instanceof Player)) {
-            commandSender.sendMessage("Нельзя команду от консоли использовать");
-            return false;
-        }
 
         if (!commandSender.hasPermission("buyer.use")) {
             commandSender.sendMessage(ColorUtil.colorize(instance.getConfig().getString("messages.no-permission")));
@@ -44,7 +39,7 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
         }
 
         if (strings.length < 1) {
-            commandSender.sendMessage(ColorUtil.colorize(joinToString(instance.getConfig().getStringList("messages.help"))));
+            commandSender.sendMessage(ColorUtil.colorize(listToString(instance.getConfig().getStringList("messages.help"))));
             return true;
         }
 
@@ -57,7 +52,7 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
                     return false;
                 }
 
-                Player player = Bukkit.getPlayer(strings[1].toLowerCase());
+                Player player = Bukkit.getServer().getPlayer(strings[1].toLowerCase());
                 if (player == null) {
                     commandSender.sendMessage(ColorUtil.colorize(instance.getConfig().getString("messages.player-not-found")));
                     return false;
@@ -80,18 +75,21 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
                 assert getDonate != null;
                 for (Player b : Bukkit.getOnlinePlayers()) {
                     if (getDonate.getBoolean("enable-sound")) {
-                        org.bukkit.Sound sound = org.bukkit.Sound.valueOf(getDonate.getString("sound").toUpperCase());
+                        Sound sound = Sound.valueOf(getDonate.getString("sound"));
                         b.playSound(b.getLocation(), sound, SoundCategory.AMBIENT, 1.0F, 1.0F);
                     }
 
-                    String msg = PlaceholderAPI.setPlaceholders(player, ColorUtil.colorize(joinToString(getDonate.getStringList("broadcast")).replace("%player%", player.getName())));
+                    String msg = PlaceholderAPI.setPlaceholders(player, ColorUtil.colorize(listToString(getDonate.getStringList("broadcast")).replace("%player%", player.getName())));
                     b.sendMessage(msg);
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), joinToString(getDonate.getStringList("give")).replace("%player%", player.getName()).replace("%group%", strings[2].toLowerCase()));
+
+                    for (String list: getDonate.getStringList("give")) {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), list.replace("%player%", player.getName()).replace("%group%", strings[2].toLowerCase()));
+                    }
                 }
 
                 if (getDonate.getBoolean("enable-title")) {
-                    String message = getDonate.getString("title");
-                    String[] parts = message.split(";", 2);
+                    String message = ColorUtil.colorize(getDonate.getString("title"));
+                    String[] parts = message != null ? message.split(";", 2) : new String[0];
 
                     String title = parts[0];
                     String subtitle = parts.length > 1 ? parts[1] : "";
@@ -104,7 +102,7 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
 
                 if (instance.getTelegram() != null) {
                     try {
-                        instance.getTelegram().sendMessage(joinToString(getDonate.getStringList("tg-message")).replace("%player%", player.getName()).replace("%date%", format));
+                        instance.getTelegram().sendMessage(listToString(getDonate.getStringList("tg-message")).replace("%player%", player.getName()).replace("%date%", format));
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -144,7 +142,13 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
         return completions;
     }
 
-    private String joinToString(List<String> list) {
-        return String.join("\n", list);
+    private static String listToString(List<String> list) {
+        StringBuilder sb = new StringBuilder();
+
+        for (String s : list) {
+            sb.append(s).append("\n");
+        }
+
+        return sb.toString();
     }
 }

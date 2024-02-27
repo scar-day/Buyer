@@ -9,7 +9,6 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 import net.md_5.bungee.config.Configuration;
 
-import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,11 +28,6 @@ public class BuyerCommand extends Command implements TabExecutor {
 
     @Override
     public void execute(CommandSender commandSender, String[] strings) {
-
-        if (!(commandSender instanceof ProxiedPlayer)) {
-            commandSender.sendMessage("Нельзя команду от консоли использовать");
-            return;
-        }
 
         if (!commandSender.hasPermission("buyer.use")) {
             commandSender.sendMessage(ColorUtil.colorize(instance.getConfig().getConfig().getString("messages.no-permission")));

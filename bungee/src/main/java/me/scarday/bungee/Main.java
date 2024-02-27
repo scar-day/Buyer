@@ -6,20 +6,18 @@ import me.scarday.bungee.configuration.Config;
 import me.scarday.bungee.http.TelegramHttp;
 import net.md_5.bungee.api.plugin.Plugin;
 
+@Getter
 public final class Main extends Plugin {
 
-    @Getter
-    public static Main instance;
+    private Main instance;
 
-    @Getter
     private TelegramHttp telegram;
 
-    @Getter
     private Config config;
 
     @Override
     public void onEnable() {
-        config = new Config(this);
+        config = new Config("config.yml", this);
         config.saveDefaultConfig();
 
         if (config.config.getBoolean("settings.tg.enable")) {
@@ -34,6 +32,7 @@ public final class Main extends Plugin {
 
     @Override
     public void onDisable() {
-
+        getProxy().getPluginManager().unregisterCommand(new BuyerCommand());
     }
+
 }

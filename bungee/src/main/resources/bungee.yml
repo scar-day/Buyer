@@ -1,4 +1,4 @@
-name: 'Buyer'
+name: Buyer
 version: '${version}'
 main: me.scarday.bungee.Main
 author: ScarDay

@@ -12,12 +12,13 @@ import java.nio.file.Files;
 
 public class Config {
 
-    public static String fileName = "config.yml";
 
+    private String configFile;
     public Main instance;
 
-    public Config(Main instance) {
+    public Config(String configFile, Main instance) {
         this.instance = instance;
+        this.configFile = configFile;
     }
 
     @Getter
@@ -29,9 +30,9 @@ public class Config {
                 instance.getDataFolder().mkdir();
             }
 
-            File file = new File(instance.getDataFolder(), fileName);
+            File file = new File(instance.getDataFolder(), configFile);
             if (!file.exists()) {
-                Files.copy(instance.getResourceAsStream(fileName), file.toPath());
+                Files.copy(instance.getResourceAsStream(configFile), file.toPath());
             }
             loadConfig();
         } catch (IOException var1) {
@@ -40,7 +41,7 @@ public class Config {
     }
     public void loadConfig() {
         try {
-            config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(instance.getDataFolder(), fileName));
+            config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(instance.getDataFolder(), configFile));
         } catch (IOException var1) {
             var1.printStackTrace();
         }
@@ -50,7 +51,7 @@ public class Config {
     }
     public void saveConfig() {
         try {
-            ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, new File(instance.getDataFolder(), fileName));
+            ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, new File(instance.getDataFolder(), configFile));
         } catch (IOException e) {
             e.printStackTrace();
         }
