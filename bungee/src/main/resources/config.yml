@@ -20,7 +20,6 @@ messages:
     - "&a/buyer give <ник> <донат> - Выдача привилегии"
     - "&a/buyer reload - Перезагрузить конфиг"
     - ""
-
 groups:
   hero:
     give:

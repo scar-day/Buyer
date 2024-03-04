@@ -52,7 +52,7 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
                     return false;
                 }
 
-                Player player = Bukkit.getServer().getPlayer(strings[1].toLowerCase());
+                Player player = instance.getServer().getPlayer(strings[1].toLowerCase());
                 if (player == null) {
                     commandSender.sendMessage(ColorUtil.colorize(instance.getConfig().getString("messages.player-not-found")));
                     return false;
@@ -73,18 +73,19 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
 
                 ConfigurationSection getDonate = section.getConfigurationSection(strings[2].toLowerCase());
                 assert getDonate != null;
-                for (Player b : Bukkit.getOnlinePlayers()) {
+
+                for (Player p : Bukkit.getOnlinePlayers()) {
                     if (getDonate.getBoolean("enable-sound")) {
                         Sound sound = Sound.valueOf(getDonate.getString("sound"));
-                        b.playSound(b.getLocation(), sound, SoundCategory.AMBIENT, 1.0F, 1.0F);
+                        p.playSound(p.getLocation(), sound, SoundCategory.AMBIENT, 1.0F, 1.0F);
                     }
 
                     String msg = PlaceholderAPI.setPlaceholders(player, ColorUtil.colorize(listToString(getDonate.getStringList("broadcast")).replace("%player%", player.getName())));
-                    b.sendMessage(msg);
+                    p.sendMessage(msg);
+                }
 
-                    for (String list: getDonate.getStringList("give")) {
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), list.replace("%player%", player.getName()).replace("%group%", strings[2].toLowerCase()));
-                    }
+                for (String list: getDonate.getStringList("give")) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), list.replace("%player%", player.getName()).replace("%group%", strings[2].toLowerCase()));
                 }
 
                 if (getDonate.getBoolean("enable-title")) {
@@ -143,12 +144,6 @@ public class BuyerCommand implements CommandExecutor, TabCompleter {
     }
 
     private static String listToString(List<String> list) {
-        StringBuilder sb = new StringBuilder();
-
-        for (String s : list) {
-            sb.append(s).append("\n");
-        }
-
-        return sb.toString();
+        return String.join("\n", list);
     }
 }
