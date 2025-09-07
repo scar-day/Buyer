@@ -1,50 +1,45 @@
 package dev.scarday.buyer.http;
 
+import dev.scarday.buyer.configuration.Configuration;
+import lombok.RequiredArgsConstructor;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+@RequiredArgsConstructor
 public class TelegramHttp {
+    private static final String API_URL = "https://api.telegram.org/bot%s/sendMessage";
 
-    // TODO: переписать этот кал...
+    private static final String CHAT_ID_FIELD = "chat_id";
+    private static final String TEXT_FIELD = "text";
 
-//    private Main instance;
-//
-//
-//
-//    private final List<String> ids;
-//    private final String token;
-//
-//    public TelegramHttp(@NotNull List<String> ids, String token) {
-//        this.ids = ids;
-//        this.token = token;
-//    }
-//
-//    public void sendMessage(String text) {
-//        CompletableFuture.runAsync(() -> {
-//            for (String chatId : ids) {
-//                try {
-//                    String urlString = "https://api.telegram.org/bot" + token + "/sendMessage?text=" + URLEncoder.encode(text, "UTF-8") + "&chat_id=" + chatId;
-//                    URL url = new URL(urlString);
-//                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//                    connection.setRequestMethod("GET");
-//                    int responseCode = connection.getResponseCode();
-//
-//                    if (responseCode != HttpURLConnection.HTTP_OK) {
-//                        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-//                        StringBuilder jsonResponse = new StringBuilder();
-//                        String inputLine;
-//
-//                        while ((inputLine = in.readLine()) != null) {
-//                            jsonResponse.append(inputLine);
-//                        }
-//                        in.close();
-//
-//                        Bukkit.getLogger().info("Произошла ошибка при отправке сообщения: " + jsonResponse);
-//                    }
-//                    connection.disconnect();
-//                } catch (IOException e) {
-//                    Bukkit.getLogger().info("Произошла ошибка при отправке сообщения: " + e);
-//                }
-//            }
-//        });
-//    }
+    private final Configuration configuration;
+    private final OkHttpClient client;
 
+    public void sendMessage(String message) {
+        String token = configuration.getSettings().getTelegram().getToken();
+        String url = String.format(API_URL, token);
 
+        for (long userId : configuration.getSettings().getTelegram().getIds()) {
+            HttpUrl httpUrl = HttpUrl.parse(url)
+                    .newBuilder()
+                    .addQueryParameter(CHAT_ID_FIELD, String.valueOf(userId))
+                    .addQueryParameter(TEXT_FIELD, message)
+                    .build();
+
+            Request request = new Request.Builder()
+                    .url(httpUrl)
+                    .get()
+                    .build();
+
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    System.out.printf("Не удалось исполнить запрос: %s", response.message());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

@@ -3,6 +3,8 @@ plugins {
 
     id("de.eldoria.plugin-yml.bukkit") version "0.7.1"
     id("com.gradleup.shadow") version "8.3.1"
+
+    id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
 group = "dev.scarday"
@@ -35,14 +37,27 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.30")
 }
 
-tasks.shadowJar {
-    archiveBaseName.set(rootProject.name)
-    archiveClassifier.set("")
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
-    relocate("net.kyori", "$group.buyer.libs.kyori")
-    relocate("com.squareup", "$group.buyer.libs.squareup")
-    relocate("dev.rollczi", "$group.buyer.libs.rollczi")
-    relocate("eu.okaeri", "$group.buyer.libs.okaeri")
+tasks {
+    shadowJar {
+        archiveBaseName.set(rootProject.name)
+        archiveClassifier.set("")
+
+        relocate("net.kyori", "$group.buyer.libs.kyori")
+        relocate("com.squareup", "$group.buyer.libs.squareup")
+        relocate("dev.rollczi", "$group.buyer.libs.rollczi")
+        relocate("eu.okaeri", "$group.buyer.libs.okaeri")
+    }
+
+    runServer {
+        minecraftVersion("1.16.5")
+
+        jvmArgs("-DPaper.IgnoreJavaVersion=true")
+    }
 }
 
 bukkit {
