@@ -1,9 +1,0 @@
-name: Buyer
-version: '${version}'
-main: me.scarday.buyer.Main
-api-version: '1.16'
-authors: [ScarDay]
-website: srcday.ru
-depend: [PlaceholderAPI]
-commands:
-  buyer: {}
